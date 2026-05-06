@@ -430,6 +430,20 @@ h3 {
     border-radius: 50%;
 }
 
+.cell.foul::after {
+    content: "!";
+    position: absolute;
+    display: grid;
+    width: 54%;
+    height: 54%;
+    place-items: center;
+    color: #111214;
+    background: var(--pink);
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
 .game-side {
     display: grid;
     gap: 1rem;

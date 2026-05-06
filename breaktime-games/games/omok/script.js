@@ -15,7 +15,6 @@ const directions = [
     [1, 1],
     [1, -1],
 ];
-
 let board = [];
 let currentPlayer = "black";
 let gameOver = false;
@@ -75,16 +74,48 @@ function handleMove(event) {
     }
 
     board[row][col] = currentPlayer;
-    moveHistory.push({ row, col, player: currentPlayer });
     cell.classList.add(currentPlayer);
     cell.disabled = true;
+
+    if (currentPlayer === "black") {
+        console.log("금수 검사 실행", row, col, currentPlayer);
+
+        const overlineLine = isOverline(row, col);
+
+        if (overlineLine.length >= 6) {
+            rollbackMove(row, col);
+            alert("장목 금수입니다. 흑돌이 6개 이상 연속되어 백돌이 승리합니다.");
+            finishForbiddenGame("장목");
+            return;
+        }
+
+        const blackWinLine = findExactWinLine(row, col, currentPlayer);
+
+        if (blackWinLine.length === 5) {
+            moveHistory.push({ row, col, player: currentPlayer });
+            finishGame(blackWinLine);
+            return;
+        }
+
+        const forbiddenMove = findForbiddenMove(row, col);
+
+        if (forbiddenMove) {
+            rollbackMove(row, col);
+            alert(`${forbiddenMove} 금수입니다.`);
+            updateStatus(`흑돌 ${forbiddenMove} 금수입니다. 다른 칸을 선택하세요.`);
+            return;
+        }
+    }
 
     const winLine = findWinLine(row, col, currentPlayer);
 
     if (winLine.length >= 5) {
+        moveHistory.push({ row, col, player: currentPlayer });
         finishGame(winLine);
         return;
     }
+
+    moveHistory.push({ row, col, player: currentPlayer });
 
     if (moveHistory.length === size * size) {
         gameOver = true;
@@ -109,6 +140,94 @@ function findWinLine(row, col, player) {
     }
 
     return [];
+}
+
+function findExactWinLine(row, col, player) {
+    for (const [rowStep, colStep] of directions) {
+        const line = getConnectedLine(row, col, rowStep, colStep, player);
+
+        if (line.length === 5) {
+            return line;
+        }
+    }
+
+    return [];
+}
+
+function findOverline(row, col) {
+    for (const [rowStep, colStep] of directions) {
+        const line = getConnectedLine(row, col, rowStep, colStep, "black");
+
+        if (line.length >= 6) {
+            return line;
+        }
+    }
+
+    return [];
+}
+
+function isOverline(row, col) {
+    return findOverline(row, col);
+}
+
+function getConnectedLine(row, col, rowStep, colStep, player) {
+    const line = [{ row, col }];
+
+    line.push(...collectStones(row, col, rowStep, colStep, player));
+    line.unshift(...collectStones(row, col, -rowStep, -colStep, player).reverse());
+
+    return line;
+}
+
+function findForbiddenMove(row, col) {
+    const openThreeCount = countOpenLines(row, col, 3);
+
+    console.log("열린 3 개수", openThreeCount);
+
+    if (isDoubleThree(openThreeCount)) {
+        return "33";
+    }
+
+    const openFourCount = countOpenLines(row, col, 4);
+
+    console.log("열린 4 개수", openFourCount);
+
+    if (isDoubleFour(openFourCount)) {
+        return "44";
+    }
+
+    return null;
+}
+
+function isDoubleThree(openThreeCount) {
+    return openThreeCount >= 2;
+}
+
+function isDoubleFour(openFourCount) {
+    return openFourCount >= 2;
+}
+
+function countOpenLines(row, col, targetLength) {
+    return directions.filter(([rowStep, colStep]) => {
+        const line = getConnectedLine(row, col, rowStep, colStep, "black");
+
+        if (line.length !== targetLength) {
+            return false;
+        }
+
+        const firstStone = line[0];
+        const lastStone = line[line.length - 1];
+        const beforeRow = firstStone.row - rowStep;
+        const beforeCol = firstStone.col - colStep;
+        const afterRow = lastStone.row + rowStep;
+        const afterCol = lastStone.col + colStep;
+
+        return isEmptyCell(beforeRow, beforeCol) && isEmptyCell(afterRow, afterCol);
+    }).length;
+}
+
+function isEmptyCell(row, col) {
+    return row >= 0 && row < size && col >= 0 && col < size && board[row][col] === null;
 }
 
 function collectStones(row, col, rowStep, colStep, player) {
@@ -140,6 +259,20 @@ function finishGame(winLine) {
     });
 
     updateStatus(`${currentPlayer === "black" ? "흑돌" : "백돌"} 승리!`);
+}
+
+function finishForbiddenGame(forbiddenMove) {
+    gameOver = true;
+    scores.white += 1;
+    updateStatus(`흑돌 ${forbiddenMove} 금수입니다. 백돌 승리!`);
+}
+
+function rollbackMove(row, col) {
+    board[row][col] = null;
+
+    const cell = getCell(row, col);
+    cell.className = "cell";
+    cell.disabled = false;
 }
 
 function undoMove() {
