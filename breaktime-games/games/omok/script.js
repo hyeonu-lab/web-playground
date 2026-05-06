@@ -78,13 +78,11 @@ function handleMove(event) {
     cell.disabled = true;
 
     if (currentPlayer === "black") {
-        console.log("금수 검사 실행", row, col, currentPlayer);
-
         const overlineLine = isOverline(row, col);
 
         if (overlineLine.length >= 6) {
             rollbackMove(row, col);
-            alert("장목 금수입니다. 흑돌이 6개 이상 연속되어 백돌이 승리합니다.");
+            alert("장목 금수입니다. 흑돌이 6개 이상 연속되어 백돌이 이깁니다.");
             finishForbiddenGame("장목");
             return;
         }
@@ -182,15 +180,11 @@ function getConnectedLine(row, col, rowStep, colStep, player) {
 function findForbiddenMove(row, col) {
     const openThreeCount = countOpenLines(row, col, 3);
 
-    console.log("열린 3 개수", openThreeCount);
-
     if (isDoubleThree(openThreeCount)) {
         return "33";
     }
 
     const openFourCount = countOpenLines(row, col, 4);
-
-    console.log("열린 4 개수", openFourCount);
 
     if (isDoubleFour(openFourCount)) {
         return "44";
