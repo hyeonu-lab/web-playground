@@ -138,7 +138,7 @@ function removeStone(row, col) {
 function handleForbiddenMove(row, col, forbiddenMove) {
     const cell = getCell(row, col);
     inputLocked = true;
-    cell.classList.remove(BLACK);
+    cell.disabled = true;
     cell.classList.add("foul", "shake");
     showGameMessage(`${forbiddenMove} 금수입니다.`, "error");
 
@@ -147,7 +147,7 @@ function handleForbiddenMove(row, col, forbiddenMove) {
         removeStone(row, col);
         inputLocked = false;
         updateStatus();
-    }, 800);
+    }, 1200);
 }
 
 function finishGame(winLine, winner) {

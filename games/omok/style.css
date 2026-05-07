@@ -182,6 +182,10 @@ h2 {
         0 8px 14px rgba(0, 0, 0, 0.34);
 }
 
+.cell.foul {
+    pointer-events: none;
+}
+
 .cell.foul::after {
     content: "!";
     position: absolute;
