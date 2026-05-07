@@ -7,14 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="game-app" id="omok">
+    <main class="omok-app">
         <section class="game-header">
             <div>
-                <p class="eyebrow">Now playing</p>
+                <p class="eyebrow">Renju rule</p>
                 <h1>오목</h1>
-                <p>빈 칸을 클릭해서 돌을 놓으세요. 흑돌이 먼저 시작합니다.</p>
+                <p>흑돌은 정확히 5목만 승리하며, 33, 44, 장목 금수가 적용됩니다.</p>
             </div>
-            <div class="score-board" id="ranking">
+            <div class="score-board" aria-label="점수">
                 <div>
                     <span>흑돌</span>
                     <strong id="blackScore">0</strong>
@@ -26,38 +26,37 @@
             </div>
         </section>
 
-        <div class="game-layout">
-            <section class="board-shell" aria-label="오목판">
-                <div class="omok-board" id="board"></div>
-            </section>
+        <section class="game-layout">
+            <div class="board-card" aria-label="15x15 오목판">
+                <div id="board" class="board"></div>
+            </div>
 
-            <aside class="game-side">
-                <div class="turn-card">
-                    <span class="turn-label">현재 차례</span>
-                    <div class="turn-player">
-                        <span class="turn-stone black" id="turnStone"></span>
+            <aside class="side-panel">
+                <section class="status-card">
+                    <span class="status-label">현재 차례</span>
+                    <div class="turn-view">
+                        <span id="turnStone" class="turn-stone black"></span>
                         <strong id="turnText">흑돌</strong>
                     </div>
-                    <p id="gameMessage">원하는 칸을 선택하세요.</p>
+                    <p id="gameMessage">흑돌 차례입니다.</p>
+                </section>
+
+                <div class="controls">
+                    <button id="newGameButton" class="button primary" type="button">새 게임</button>
+                    <button id="undoButton" class="button ghost" type="button">무르기</button>
                 </div>
 
-                <div class="control-grid">
-                    <button class="button primary" type="button" id="newGameButton">새 게임</button>
-                    <button class="button ghost" type="button" id="undoButton">무르기</button>
-                </div>
-
-                <div class="rules-card">
-                    <h2>게임 규칙</h2>
+                <section class="rules-card">
+                    <h2>규칙</h2>
                     <ul>
                         <li>흑돌부터 시작합니다.</li>
-                        <li>같은 돌 5개가 일직선이면 승리합니다.</li>
-                        <li>흑돌은 6목이면 백돌이 승리합니다.</li>
-                        <li>흑돌은 33, 44 금수가 적용됩니다.</li>
-                        <li>백돌은 금수 제한 없이 5목 이상이면 승리합니다.</li>
+                        <li>흑돌은 33, 44, 장목이 금수입니다.</li>
+                        <li>금수 돌은 제거되고 턴은 넘어가지 않습니다.</li>
+                        <li>백돌은 5목 이상이면 승리합니다.</li>
                     </ul>
-                </div>
+                </section>
             </aside>
-        </div>
+        </section>
     </main>
 
     <script src="script.js"></script>
