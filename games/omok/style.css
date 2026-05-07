@@ -1,0 +1,308 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #111214;
+    --panel: #191b20;
+    --text: #f5f7fb;
+    --muted: #a7afbd;
+    --line: rgba(255, 255, 255, 0.12);
+    --lime: #b6f24a;
+    --cyan: #39d5ff;
+    --pink: #ff5ca8;
+    --board: #d6a85d;
+    --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text);
+    background: var(--bg);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button {
+    font: inherit;
+}
+
+.game-app {
+    width: min(100% - 24px, 1040px);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2rem) 0;
+}
+
+.eyebrow {
+    margin: 0 0 0.7rem;
+    color: var(--lime);
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 0.7rem;
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    line-height: 1;
+}
+
+h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+}
+
+.game-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.game-header p,
+.turn-card p,
+.rules-card li {
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+.game-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.board-shell,
+.game-side > *,
+.score-board {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.board-shell {
+    display: grid;
+    place-items: center;
+    padding: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+.omok-board {
+    --cell: min(5.2vw, 38px);
+    display: grid;
+    grid-template-columns: repeat(15, var(--cell));
+    grid-template-rows: repeat(15, var(--cell));
+    padding: calc(var(--cell) * 0.48);
+    background:
+        linear-gradient(90deg, transparent calc(50% - 1px), rgba(72, 43, 16, 0.72) calc(50% - 1px), rgba(72, 43, 16, 0.72) calc(50% + 1px), transparent calc(50% + 1px)),
+        linear-gradient(transparent calc(50% - 1px), rgba(72, 43, 16, 0.72) calc(50% - 1px), rgba(72, 43, 16, 0.72) calc(50% + 1px), transparent calc(50% + 1px)),
+        var(--board);
+    background-size: var(--cell) var(--cell);
+    background-position: calc(var(--cell) * 0.5) calc(var(--cell) * 0.5);
+    border: 12px solid #9d6730;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+
+.cell {
+    position: relative;
+    display: grid;
+    width: var(--cell);
+    height: var(--cell);
+    place-items: center;
+    padding: 0;
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+}
+
+.cell::before {
+    content: "";
+    width: 74%;
+    height: 74%;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.cell:hover::before,
+.cell:focus-visible::before {
+    opacity: 0.28;
+    transform: scale(0.9);
+    background: currentColor;
+}
+
+.cell.black,
+.cell.white {
+    cursor: default;
+}
+
+.cell.black::before,
+.cell.white::before {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.28);
+}
+
+.cell.black::before {
+    background: radial-gradient(circle at 32% 28%, #626a76, #070809 68%);
+}
+
+.cell.white::before {
+    background: radial-gradient(circle at 30% 25%, #ffffff, #d9dde5 70%);
+}
+
+.cell.win::after {
+    content: "";
+    position: absolute;
+    width: 42%;
+    height: 42%;
+    border: 3px solid var(--pink);
+    border-radius: 50%;
+}
+
+.game-side {
+    display: grid;
+    gap: 1rem;
+}
+
+.turn-card,
+.rules-card {
+    padding: 1.1rem;
+}
+
+.turn-label {
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.turn-player {
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    margin: 0.7rem 0 0.5rem;
+    font-size: 1.45rem;
+}
+
+.turn-stone {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.turn-stone.black {
+    background: radial-gradient(circle at 32% 28%, #626a76, #070809 68%);
+}
+
+.turn-stone.white {
+    background: radial-gradient(circle at 30% 25%, #ffffff, #d9dde5 70%);
+}
+
+.control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
+    padding: 0.8rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 900;
+}
+
+.button.primary {
+    color: #111214;
+    background: var(--lime);
+}
+
+.button.ghost {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--line);
+}
+
+.rules-card ul {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding-left: 1.15rem;
+}
+
+.score-board {
+    display: grid;
+    grid-template-columns: repeat(2, 90px);
+    gap: 0.7rem;
+    padding: 0.8rem;
+}
+
+.score-board div {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.score-board span {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.score-board strong {
+    font-size: 1.7rem;
+}
+
+@media (max-width: 820px) {
+    .game-header,
+    .game-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .game-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .game-side {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .rules-card {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .game-side {
+        grid-template-columns: 1fr;
+    }
+
+    .rules-card {
+        grid-column: auto;
+    }
+
+    .score-board {
+        width: 100%;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .omok-board {
+        --cell: calc((100vw - 88px) / 15);
+        border-width: 8px;
+    }
+}
