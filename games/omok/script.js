@@ -15,30 +15,20 @@ const directions = [
     [1, -1],
 ];
 
-const openThreePatterns = [
-    ".BBB.",
-    ".BB.B.",
-    ".B.BB.",
-];
-
-const fourPatterns = [
-    "BBBB.",
-    ".BBBB",
-    "BBB.B",
-    "BB.BB",
-    "B.BBB",
-];
-
 let board = [];
 let currentPlayer = "black";
 let gameOver = false;
 let moveHistory = [];
+let messageResetTimer = null;
+let messageLocked = false;
 let scores = {
     black: 0,
     white: 0,
 };
 
 function createBoard() {
+    clearTimeout(messageResetTimer);
+    messageLocked = false;
     boardElement.innerHTML = "";
     board = Array.from({ length: size }, () => Array(size).fill(null));
     moveHistory = [];
@@ -64,9 +54,18 @@ function updateStatus(message) {
     const playerText = currentPlayer === "black" ? "흑돌" : "백돌";
     turnText.textContent = playerText;
     turnStone.className = `turn-stone ${currentPlayer}`;
-    gameMessage.textContent = message || `${playerText} 차례입니다.`;
+
+    if (!messageLocked) {
+        showGameMessage(message || `${playerText} 차례입니다.`);
+    }
+
     blackScoreElement.textContent = scores.black;
     whiteScoreElement.textContent = scores.white;
+}
+
+function showGameMessage(message, type = "normal") {
+    gameMessage.textContent = message;
+    gameMessage.classList.toggle("message-error", type === "error");
 }
 
 function getCell(row, col) {
@@ -95,18 +94,16 @@ function handleMove(event) {
         const overlineLine = isOverline(row, col);
 
         if (overlineLine.length >= 6) {
-            alert("장목 금수입니다.");
             moveHistory.push({ row, col, player: currentPlayer });
-            finishForbiddenGame("장목");
+            finishForbiddenGame("장목", row, col);
             return;
         }
 
         const forbiddenMove = findForbiddenMove(row, col);
 
         if (forbiddenMove) {
-            alert(`${forbiddenMove} 금수입니다. 흑돌이 패배합니다.`);
             moveHistory.push({ row, col, player: currentPlayer });
-            finishForbiddenGame(forbiddenMove);
+            finishForbiddenGame(forbiddenMove, row, col);
             return;
         }
 
@@ -185,11 +182,13 @@ function getConnectedLine(row, col, rowStep, colStep, player) {
 }
 
 function findForbiddenMove(row, col) {
-    const { threeCount, fourCount } = countForbiddenPatterns(row, col);
+    const fourCount = countFourThreats(row, col);
 
     if (fourCount >= 2) {
         return "44";
     }
+
+    const threeCount = countOpenThreeThreats(row, col);
 
     if (threeCount >= 2) {
         return "33";
@@ -198,57 +197,53 @@ function findForbiddenMove(row, col) {
     return null;
 }
 
-function countForbiddenPatterns(row, col) {
-    let threeCount = 0;
+function countFourThreats(row, col) {
     let fourCount = 0;
-    const range = 5;
 
     for (const [rowStep, colStep] of directions) {
-        const { values, centerIndex } = getLineValues(row, col, rowStep, colStep, range);
-        const lineThreeCount = countCenteredPatterns(values, centerIndex, openThreePatterns);
-        const lineFourCount = countCenteredPatterns(values, centerIndex, fourPatterns);
-
-        if (lineThreeCount > 0) {
-            threeCount += 1;
-        }
-
-        if (lineFourCount > 0) {
+        if (directionHasFiveThreat(row, col, rowStep, colStep)) {
             fourCount += 1;
         }
 
         console.log("현재 착수:", row, col);
         console.log("검사 방향:", rowStep, colStep);
-        console.log("라인:", values.join(""));
-        console.log("3 개수:", threeCount);
         console.log("4 개수:", fourCount);
     }
 
-    return { threeCount, fourCount };
+    return fourCount;
 }
 
-function countCenteredPatterns(values, centerIndex, patterns) {
-    let count = 0;
+function countOpenThreeThreats(row, col) {
+    let threeCount = 0;
 
-    for (const pattern of patterns) {
-        if (includesPatternAtCenter(values, centerIndex, pattern)) {
-            count += 1;
+    for (const [rowStep, colStep] of directions) {
+        if (directionHasOpenThreeThreat(row, col, rowStep, colStep)) {
+            threeCount += 1;
         }
+
+        console.log("현재 착수:", row, col);
+        console.log("검사 방향:", rowStep, colStep);
+        console.log("3 개수:", threeCount);
     }
 
-    return count;
+    return threeCount;
 }
 
-function includesPatternAtCenter(values, centerIndex, pattern) {
-    const line = values.join("");
+function directionHasFiveThreat(row, col, rowStep, colStep) {
+    for (let offset = -4; offset <= 4; offset += 1) {
+        const nextRow = row + rowStep * offset;
+        const nextCol = col + colStep * offset;
 
-    for (let start = 0; start <= line.length - pattern.length; start += 1) {
-        const end = start + pattern.length - 1;
-
-        if (centerIndex < start || centerIndex > end) {
+        if (!isOpenEnd(nextRow, nextCol)) {
             continue;
         }
 
-        if (line.slice(start, start + pattern.length) === pattern) {
+        board[nextRow][nextCol] = "black";
+        const makesFive = createsFive(nextRow, nextCol, rowStep, colStep);
+        const containsMove = connectedLineContains(nextRow, nextCol, rowStep, colStep, row, col);
+        board[nextRow][nextCol] = null;
+
+        if (makesFive && containsMove) {
             return true;
         }
     }
@@ -256,36 +251,85 @@ function includesPatternAtCenter(values, centerIndex, pattern) {
     return false;
 }
 
-function getLineValues(row, col, rowStep, colStep, range = 5) {
-    const values = [];
-
-    for (let offset = -range; offset <= range; offset += 1) {
+function directionHasOpenThreeThreat(row, col, rowStep, colStep) {
+    for (let offset = -4; offset <= 4; offset += 1) {
         const nextRow = row + rowStep * offset;
         const nextCol = col + colStep * offset;
 
-        values.push(getCellValue(nextRow, nextCol));
+        if (!isOpenEnd(nextRow, nextCol)) {
+            continue;
+        }
+
+        board[nextRow][nextCol] = "black";
+        const makesOpenFour = createsOpenFour(nextRow, nextCol, rowStep, colStep);
+        const containsMove = connectedLineContains(nextRow, nextCol, rowStep, colStep, row, col);
+        board[nextRow][nextCol] = null;
+
+        if (makesOpenFour && containsMove) {
+            return true;
+        }
     }
 
-    return {
-        values,
-        centerIndex: range,
-    };
+    return false;
 }
 
-function getCellValue(row, col) {
-    if (row < 0 || row >= size || col < 0 || col >= size) {
-        return "W";
+function createsFive(row, col, rowStep, colStep) {
+    return getConnectedCount(row, col, rowStep, colStep) === 5;
+}
+
+function createsOpenFour(row, col, rowStep, colStep) {
+    const connectedCount = getConnectedCount(row, col, rowStep, colStep);
+
+    if (connectedCount !== 4) {
+        return false;
     }
 
-    if (board[row][col] === "black") {
-        return "B";
+    const forwardCount = countStones(row, col, rowStep, colStep);
+    const backwardCount = countStones(row, col, -rowStep, -colStep);
+    const forwardEndRow = row + rowStep * (forwardCount + 1);
+    const forwardEndCol = col + colStep * (forwardCount + 1);
+    const backwardEndRow = row - rowStep * (backwardCount + 1);
+    const backwardEndCol = col - colStep * (backwardCount + 1);
+
+    return isOpenEnd(forwardEndRow, forwardEndCol) && isOpenEnd(backwardEndRow, backwardEndCol);
+}
+
+function getConnectedCount(row, col, rowStep, colStep) {
+    return (
+        1 +
+        countStones(row, col, rowStep, colStep) +
+        countStones(row, col, -rowStep, -colStep)
+    );
+}
+
+function connectedLineContains(row, col, rowStep, colStep, targetRow, targetCol) {
+    const line = getConnectedLine(row, col, rowStep, colStep, "black");
+
+    return line.some((stone) => stone.row === targetRow && stone.col === targetCol);
+}
+
+function countStones(row, col, rowStep, colStep) {
+    let count = 0;
+    let nextRow = row + rowStep;
+    let nextCol = col + colStep;
+
+    while (
+        nextRow >= 0 &&
+        nextRow < size &&
+        nextCol >= 0 &&
+        nextCol < size &&
+        board[nextRow][nextCol] === "black"
+    ) {
+        count += 1;
+        nextRow += rowStep;
+        nextCol += colStep;
     }
 
-    if (board[row][col] === "white") {
-        return "W";
-    }
+    return count;
+}
 
-    return ".";
+function isOpenEnd(row, col) {
+    return row >= 0 && row < size && col >= 0 && col < size && board[row][col] === null;
 }
 
 function collectStones(row, col, rowStep, colStep, player) {
@@ -319,10 +363,30 @@ function finishGame(winLine) {
     updateStatus(`${currentPlayer === "black" ? "흑돌" : "백돌"} 승리!`);
 }
 
-function finishForbiddenGame(forbiddenMove) {
+function finishForbiddenGame(forbiddenMove, row, col) {
     gameOver = true;
     scores.white += 1;
-    updateStatus(`흑돌 ${forbiddenMove} 금수입니다. 백돌 승리!`);
+
+    const cell = getCell(row, col);
+
+    if (cell) {
+        cell.classList.add("foul", "shake");
+
+        window.setTimeout(() => {
+            cell.classList.remove("shake");
+        }, 800);
+    }
+
+    blackScoreElement.textContent = scores.black;
+    whiteScoreElement.textContent = scores.white;
+    messageLocked = true;
+    showGameMessage(`${forbiddenMove} 금수입니다.`, "error");
+
+    clearTimeout(messageResetTimer);
+    messageResetTimer = window.setTimeout(() => {
+        messageLocked = false;
+        updateStatus("백돌 승리! 새 게임을 시작하세요.");
+    }, 2000);
 }
 
 function undoMove() {
