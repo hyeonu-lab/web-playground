@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>핀볼 뽑기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="pinball-app">
+        <section class="tool-header">
+            <div>
+                <p class="eyebrow">Learning support</p>
+                <h1>핀볼 뽑기</h1>
+                <p>학생, 모둠, 발표 주제를 입력하고 핀볼 구슬로 하나를 뽑습니다.</p>
+            </div>
+            <div class="winner-card" aria-live="polite">
+                <span>선택 결과</span>
+                <strong id="winnerName">대기 중</strong>
+            </div>
+        </section>
+
+        <section class="tool-layout">
+            <section class="machine-card" aria-label="핀볼 뽑기 기계">
+                <canvas id="pinballCanvas" width="760" height="860"></canvas>
+            </section>
+
+            <aside class="control-panel">
+                <section class="panel-card">
+                    <label for="nameInput">뽑기 목록</label>
+                    <textarea id="nameInput" spellcheck="false">김민준
+이서연
+박지후
+최하린
+정도윤
+한유나
+발표 1모둠
+발표 2모둠</textarea>
+                    <p class="hint">한 줄에 하나씩 입력합니다. <code>이름*2</code>처럼 쓰면 확률을 높일 수 있습니다.</p>
+                </section>
+
+                <div class="button-row">
+                    <button id="shuffleButton" class="button ghost" type="button">섞기</button>
+                    <button id="startButton" class="button primary" type="button">시작</button>
+                </div>
+
+                <section class="panel-card compact">
+                    <div class="stat-row">
+                        <span>항목 수</span>
+                        <strong id="itemCount">0</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>뽑은 횟수</span>
+                        <strong id="drawCount">0</strong>
+                    </div>
+                </section>
+
+                <section class="panel-card">
+                    <div class="history-heading">
+                        <h2>기록</h2>
+                        <button id="clearHistoryButton" class="text-button" type="button">초기화</button>
+                    </div>
+                    <ol id="historyList" class="history-list"></ol>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

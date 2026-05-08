@@ -1,0 +1,277 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #101114;
+    --panel: #1a1d24;
+    --panel-soft: #232935;
+    --text: #f7f9fc;
+    --muted: #a8b0bf;
+    --line: rgba(255, 255, 255, 0.13);
+    --lime: #b6f24a;
+    --cyan: #39d5ff;
+    --amber: #ffd166;
+    --pink: #ff5ca8;
+    --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 20% 0%, rgba(57, 213, 255, 0.16), transparent 26rem),
+        linear-gradient(180deg, #151821, var(--bg));
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.pinball-app {
+    width: min(1160px, calc(100% - 24px));
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2rem) 0;
+}
+
+.tool-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.eyebrow {
+    margin: 0 0 0.7rem;
+    color: var(--lime);
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 0.65rem;
+    font-size: clamp(2.2rem, 7vw, 4.4rem);
+    line-height: 1;
+}
+
+h2 {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+}
+
+.tool-header p:last-child,
+.hint {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.tool-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.machine-card,
+.panel-card,
+.winner-card {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.machine-card {
+    overflow: hidden;
+    padding: clamp(0.6rem, 2vw, 1rem);
+}
+
+#pinballCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 620px;
+    background: var(--panel);
+    border-radius: 6px;
+}
+
+.winner-card {
+    display: grid;
+    min-width: min(100%, 270px);
+    gap: 0.35rem;
+    padding: 1rem;
+}
+
+.winner-card span,
+label,
+.stat-row span {
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 800;
+}
+
+.winner-card strong {
+    color: var(--amber);
+    font-size: clamp(1.5rem, 4vw, 2.3rem);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.control-panel {
+    display: grid;
+    gap: 1rem;
+}
+
+.panel-card {
+    display: grid;
+    gap: 0.8rem;
+    padding: 1rem;
+}
+
+textarea {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    padding: 0.85rem;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    outline: none;
+    line-height: 1.55;
+}
+
+textarea:focus {
+    border-color: rgba(57, 213, 255, 0.65);
+    box-shadow: 0 0 0 3px rgba(57, 213, 255, 0.12);
+}
+
+code {
+    color: var(--cyan);
+}
+
+.button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.button {
+    min-height: 48px;
+    padding: 0.85rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 900;
+}
+
+.button.primary {
+    color: #101114;
+    background: var(--lime);
+}
+
+.button.ghost {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--line);
+}
+
+.button:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.compact {
+    gap: 0.55rem;
+}
+
+.stat-row,
+.history-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.stat-row strong {
+    font-size: 1.55rem;
+}
+
+.text-button {
+    padding: 0;
+    color: var(--cyan);
+    background: transparent;
+    border: 0;
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+.history-list {
+    display: grid;
+    max-height: 170px;
+    gap: 0.45rem;
+    overflow: auto;
+    margin: 0;
+    padding-left: 1.35rem;
+    color: var(--muted);
+    line-height: 1.45;
+}
+
+.history-list strong {
+    color: var(--text);
+}
+
+@media (max-width: 880px) {
+    .tool-header,
+    .tool-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tool-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .winner-card {
+        width: 100%;
+    }
+
+    .control-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel-card:first-child,
+    .panel-card:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 560px) {
+    .control-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-card:first-child,
+    .panel-card:last-child {
+        grid-column: auto;
+    }
+
+    #pinballCanvas {
+        min-height: 520px;
+    }
+}

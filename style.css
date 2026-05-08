@@ -216,6 +216,10 @@ h2 {
     background: var(--lime);
 }
 
+.tool-card .tag.live {
+    background: var(--cyan);
+}
+
 .tag.soon {
     color: var(--text);
     background: rgba(255, 255, 255, 0.12);
