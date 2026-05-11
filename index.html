@@ -3,94 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>쉬는시간 게임방</title>
+    <title>교실 활동 도구 모음</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header class="site-header">
-        <a class="brand" href="/" aria-label="쉬는시간 게임방">
-            <span class="brand-mark">▶</span>
-            <span>쉬는시간 게임방</span>
+        <a class="brand" href="#home" aria-label="교실 활동 도구 모음 홈">
+            <span class="brand-mark" aria-hidden="true">A</span>
+            <span class="brand-name">교실도구</span>
         </a>
-        <nav class="site-nav" aria-label="주요 메뉴">
-            <a href="#games">게임 목록</a>
-            <a href="#tools">학습지원도구</a>
-            <a href="#play">플레이</a>
+
+        <nav class="site-nav" aria-label="주요 기능">
+            <a href="#seat-chart">자리바꾸기</a>
+            <a href="#roulette">룰렛</a>
+            <a href="#ladder">사다리타기</a>
+            <a href="#pinball">핀볼 추첨기</a>
+            <a href="#omok">오목</a>
         </nav>
     </header>
 
     <main>
-        <section class="intro">
-            <p class="eyebrow">Break time arcade</p>
-            <h1>iframe으로 바로 실행하는 미니 게임과 교실 도구</h1>
-            <p>
-                메인 사이트는 게임과 학습지원도구 목록, 실행 영역만 담당합니다.
-                각 기능은 <code>games/</code>와 <code>tools/</code> 폴더 안에서 독립적인 HTML, CSS, JavaScript로 관리됩니다.
-            </p>
-        </section>
-
-        <section class="game-list" id="games" aria-labelledby="gameListTitle">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Game shelf</p>
-                    <h2 id="gameListTitle">게임 목록</h2>
-                </div>
+        <section class="hero" id="home" aria-labelledby="heroTitle">
+            <div class="hero-copy">
+                <p class="eyebrow">Classroom activity tools</p>
+                <h1 id="heroTitle">수업과 활동을 더 재미있게</h1>
+                <p class="hero-description">교실에서 바로 사용할 수 있는 간단한 웹 도구 모음</p>
+                <a class="primary-button" href="#features">바로 시작하기</a>
             </div>
 
-            <div class="game-grid">
-                <button class="game-card active" type="button" data-game-src="/games/omok/index.html" data-game-title="오목">
-                    <span class="tag live">Live</span>
-                    <strong>오목</strong>
-                    <span>15x15 보드에서 흑백이 번갈아 두는 쉬운 오목 게임입니다.</span>
-                </button>
-
-                <button class="game-card" type="button" data-game-src="" data-game-title="Snake" disabled>
-                    <span class="tag soon">Soon</span>
-                    <strong>Snake</strong>
-                    <span><code>games/snake/</code> 폴더를 추가하면 연결할 수 있습니다.</span>
-                </button>
-
-                <button class="game-card" type="button" data-game-src="" data-game-title="Tetris" disabled>
-                    <span class="tag soon">Soon</span>
-                    <strong>Tetris</strong>
-                    <span><code>games/tetris/</code> 폴더를 추가하면 연결할 수 있습니다.</span>
-                </button>
+            <div class="hero-art" aria-hidden="true">
+                <div class="art-board">
+                    <span class="art-chip chip-lime">자리</span>
+                    <span class="art-chip chip-dark">추첨</span>
+                    <span class="art-chip chip-soft">놀이</span>
+                    <div class="art-orbit">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <section class="game-list" id="tools" aria-labelledby="toolListTitle">
+        <section class="feature-section" id="features" aria-labelledby="featureTitle">
             <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Learning tools</p>
-                    <h2 id="toolListTitle">학습지원도구</h2>
-                </div>
+                <p class="eyebrow">Tools and games</p>
+                <h2 id="featureTitle">기능 목록</h2>
             </div>
 
-            <div class="game-grid">
-                <button class="game-card tool-card" type="button" data-game-src="/tools/pinball-draw/index.html" data-game-title="핀볼 뽑기">
-                    <span class="tag live">Tool</span>
-                    <strong>핀볼 뽑기</strong>
-                    <span>학생 이름이나 발표 주제를 넣고 구슬을 떨어뜨려 무작위로 뽑는 도구입니다.</span>
-                </button>
+            <div class="feature-grid">
+                <article class="feature-card" id="seat-chart">
+                    <span class="tag tag-tool">Tool</span>
+                    <h3>자리바꾸기</h3>
+                    <p>학생 이름과 조건을 입력해 교실 자리표를 빠르게 만듭니다.</p>
+                    <button type="button" data-game-src="tools/seat-chart/index.html" data-game-title="자리바꾸기">실행하기</button>
+                </article>
 
-                <button class="game-card tool-card" type="button" data-game-src="/tools/seat-chart/index.html" data-game-title="자리바꾸기표">
-                    <span class="tag live">Tool</span>
-                    <strong>자리바꾸기표</strong>
-                    <span>학생 이름, 분단 수, 행과 열을 입력해 따뜻한 교실 느낌의 자리표를 만듭니다.</span>
-                </button>
+                <article class="feature-card muted-card" id="roulette">
+                    <span class="tag tag-soon">Soon</span>
+                    <h3>룰렛</h3>
+                    <p>발표자, 주제, 팀을 무작위로 고르는 룰렛 도구를 연결할 수 있습니다.</p>
+                    <button type="button" disabled>준비중</button>
+                </article>
+
+                <article class="feature-card muted-card" id="ladder">
+                    <span class="tag tag-soon">Soon</span>
+                    <h3>사다리타기</h3>
+                    <p>선택지와 결과를 연결하는 사다리타기 기능을 추가할 수 있습니다.</p>
+                    <button type="button" disabled>준비중</button>
+                </article>
+
+                <article class="feature-card" id="pinball">
+                    <span class="tag tag-tool">Tool</span>
+                    <h3>핀볼 추첨기</h3>
+                    <p>이름이나 항목을 넣고 공을 떨어뜨려 무작위로 추첨합니다.</p>
+                    <button type="button" data-game-src="tools/pinball-draw/index.html" data-game-title="핀볼 추첨기">실행하기</button>
+                </article>
+
+                <article class="feature-card" id="omok">
+                    <span class="tag tag-game">Game</span>
+                    <h3>오목</h3>
+                    <p>쉬는 시간이나 활동 마무리에 바로 실행할 수 있는 오목 게임입니다.</p>
+                    <button type="button" data-game-src="games/omok/index.html" data-game-title="오목">실행하기</button>
+                </article>
             </div>
         </section>
 
         <section class="play-section" id="play" aria-labelledby="playTitle">
-            <div class="section-heading">
-                <div>
-                    <p class="eyebrow">Now playing</p>
-                    <h2 id="playTitle">오목</h2>
-                </div>
+            <div class="section-heading play-heading">
+                <p class="eyebrow">Now playing</p>
+                <h2 id="playTitle">오목</h2>
             </div>
 
             <div class="frame-card">
-                <iframe id="gameFrame" src="/games/omok/index.html" title="실행 화면"></iframe>
+                <iframe id="gameFrame" src="games/omok/index.html" title="기능 실행 화면"></iframe>
             </div>
         </section>
     </main>
