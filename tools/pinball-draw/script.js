@@ -79,48 +79,48 @@ function playRollInSound() {
     }
 
     const now = audioContext.currentTime;
-    const duration = 0.48;
+    const duration = 0.52;
     const bufferSize = audioContext.sampleRate * duration;
     const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
     const data = buffer.getChannelData(0);
 
     for (let index = 0; index < bufferSize; index += 1) {
         const progress = index / bufferSize;
-        const tick = Math.sin(progress * Math.PI * 64) > 0.76 ? 1 : 0;
-        data[index] = (Math.random() * 2 - 1) * tick * (1 - progress);
+        const tick = Math.sin(progress * Math.PI * 96) > 0.68 ? 1 : 0;
+        data[index] = (Math.random() * 2 - 1) * tick * (1 - progress) * 0.72;
     }
 
     const noise = audioContext.createBufferSource();
     const filter = audioContext.createBiquadFilter();
     const gain = audioContext.createGain();
-    const rumble = audioContext.createOscillator();
-    const rumbleGain = audioContext.createGain();
+    const sparkle = audioContext.createOscillator();
+    const sparkleGain = audioContext.createGain();
 
     noise.buffer = buffer;
     filter.type = "bandpass";
-    filter.frequency.setValueAtTime(520, now);
-    filter.frequency.exponentialRampToValueAtTime(160, now + duration);
-    filter.Q.setValueAtTime(3.5, now);
+    filter.frequency.setValueAtTime(1450, now);
+    filter.frequency.exponentialRampToValueAtTime(720, now + duration);
+    filter.Q.setValueAtTime(5.5, now);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.11, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.025);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
-    rumble.type = "sine";
-    rumble.frequency.setValueAtTime(120, now);
-    rumble.frequency.exponentialRampToValueAtTime(62, now + duration);
-    rumbleGain.gain.setValueAtTime(0.0001, now);
-    rumbleGain.gain.exponentialRampToValueAtTime(0.045, now + 0.04);
-    rumbleGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    sparkle.type = "triangle";
+    sparkle.frequency.setValueAtTime(940, now);
+    sparkle.frequency.exponentialRampToValueAtTime(520, now + duration);
+    sparkleGain.gain.setValueAtTime(0.0001, now);
+    sparkleGain.gain.exponentialRampToValueAtTime(0.035, now + 0.035);
+    sparkleGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     noise.connect(filter);
     filter.connect(gain);
     gain.connect(audioContext.destination);
-    rumble.connect(rumbleGain);
-    rumbleGain.connect(audioContext.destination);
+    sparkle.connect(sparkleGain);
+    sparkleGain.connect(audioContext.destination);
     noise.start(now);
-    rumble.start(now);
+    sparkle.start(now);
     noise.stop(now + duration);
-    rumble.stop(now + duration);
+    sparkle.stop(now + duration);
 }
 
 function rawEntryItems() {
