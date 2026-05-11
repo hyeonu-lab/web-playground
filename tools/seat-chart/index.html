@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자리바꾸기표</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="classroom-app">
+        <section class="classroom-stage" aria-label="자리바꾸기표 미리보기">
+            <header class="classroom-board">
+                <input id="classTitleInput" class="classroom-title-input" type="text" value="학급 명을 입력해주세요" aria-label="반 제목">
+            </header>
+
+            <section class="teacher-zone" aria-label="교탁">
+                <div class="classroom-character" aria-hidden="true">
+                    <div class="character-ear left"></div>
+                    <div class="character-ear right"></div>
+                    <div class="character-face">
+                        <span class="character-eye left"></span>
+                        <span class="character-eye right"></span>
+                        <span class="character-nose"></span>
+                        <span class="character-mouth"></span>
+                    </div>
+                </div>
+                <div class="teacher-desk">
+                    <span>교탁</span>
+                </div>
+            </section>
+
+            <section id="seatArea" class="seat-area" aria-label="학생 좌석 배치"></section>
+
+            <section id="unassignedArea" class="unassigned-area" aria-label="배치되지 않은 학생"></section>
+        </section>
+
+        <aside class="classroom-panel" aria-label="자리표 설정">
+            <div class="panel-heading">
+                <p>Classroom planner</p>
+                <h1>자리바꾸기표 만들기</h1>
+            </div>
+
+            <label class="setting-field" for="panelTitleInput">
+                <span>반 제목</span>
+                <input id="panelTitleInput" type="text" value="학급 명을 입력해주세요">
+            </label>
+
+            <label class="setting-field hidden-setting" for="studentNamesInput">
+                <span>학생 이름</span>
+                <textarea id="studentNamesInput" spellcheck="false"></textarea>
+            </label>
+
+            <div class="setting-grid">
+                <label class="setting-field" for="groupCountInput">
+                    <span>분단 개수</span>
+                    <input id="groupCountInput" type="number" min="1" max="6" value="2">
+                </label>
+                <label class="setting-field" for="colsInput">
+                    <span>분단당 열 수</span>
+                    <input id="colsInput" type="number" min="1" max="4" value="2">
+                </label>
+                <label class="setting-field" for="rowsInput">
+                    <span>분단당 행 수</span>
+                    <input id="rowsInput" type="number" min="1" max="8" value="5">
+                </label>
+            </div>
+
+            <div class="button-row">
+                <button id="shuffleSeatsButton" class="primary-button" type="button">자리 섞기</button>
+                <button id="printButton" class="secondary-button" type="button">인쇄</button>
+                <button id="resetButton" class="secondary-button" type="button">초기화</button>
+            </div>
+
+            <p id="statusMessage" class="status-message" role="status" aria-live="polite"></p>
+        </aside>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

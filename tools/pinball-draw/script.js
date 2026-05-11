@@ -13,6 +13,7 @@ const duplicateModeText = document.querySelector("#duplicateModeText");
 const listStatus = document.querySelector("#listStatus");
 
 const MAX_ENTRIES = 8;
+const MASTER_VOLUME = 10.0;
 
 const board = {
     width: canvas.width,
@@ -32,6 +33,8 @@ const state = {
     activeSlots: null,
     settledBalls: [],
     drawnLabels: [],
+    cycleComplete: false,
+    restartButtonBounds: null,
 };
 
 let audioContext = null;
@@ -44,6 +47,10 @@ function ensureAudioContext() {
     if (audioContext.state === "suspended") {
         audioContext.resume();
     }
+}
+
+function volume(level) {
+    return Math.max(0.0001, level * MASTER_VOLUME);
 }
 
 function playBounceSound() {
@@ -63,7 +70,7 @@ function playBounceSound() {
     filter.frequency.setValueAtTime(1200, now);
     filter.Q.setValueAtTime(6, now);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(volume(0.12), now + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
     oscillator.connect(filter);
@@ -102,14 +109,14 @@ function playRollInSound() {
     filter.frequency.exponentialRampToValueAtTime(720, now + duration);
     filter.Q.setValueAtTime(5.5, now);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.025);
+    gain.gain.exponentialRampToValueAtTime(volume(0.08), now + 0.025);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     sparkle.type = "triangle";
     sparkle.frequency.setValueAtTime(940, now);
     sparkle.frequency.exponentialRampToValueAtTime(520, now + duration);
     sparkleGain.gain.setValueAtTime(0.0001, now);
-    sparkleGain.gain.exponentialRampToValueAtTime(0.035, now + 0.035);
+    sparkleGain.gain.exponentialRampToValueAtTime(volume(0.035), now + 0.035);
     sparkleGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     noise.connect(filter);
@@ -203,8 +210,11 @@ function syncEntries() {
     state.entries = parseEntries();
     state.activeSlots = null;
     state.settledBalls = [];
+    state.cycleComplete = false;
+    state.restartButtonBounds = null;
     state.drawnLabels = state.drawnLabels.filter((label) => labels.includes(label));
     itemCount.textContent = `${labels.length}/${MAX_ENTRIES}`;
+    startButton.disabled = false;
     updateListStatus();
     draw();
 }
@@ -326,6 +336,10 @@ function buildBouncePath(endX, endY) {
 }
 
 function launchBall() {
+    if (state.cycleComplete) {
+        return;
+    }
+
     ensureAudioContext();
     const winner = pickWinner();
 
@@ -334,10 +348,6 @@ function launchBall() {
     }
 
     const totalDrawsInCycle = uniqueLabels(state.entries).length;
-
-    if (totalDrawsInCycle > 0 && state.settledBalls.length >= totalDrawsInCycle) {
-        state.settledBalls = [];
-    }
 
     const slots = slotData(winner);
     const slotIndex = targetSlotIndex(winner, slots);
@@ -392,6 +402,7 @@ function ballPosition(ball, now) {
 function finishDraw() {
     const result = state.winner;
     const completedBall = state.ball;
+    const totalDrawsInCycle = uniqueLabels(state.entries).length;
     state.running = false;
     state.ball = null;
     state.settledBalls.push({
@@ -405,7 +416,8 @@ function finishDraw() {
         state.drawnLabels.push(result);
     }
 
-    startButton.disabled = false;
+    state.cycleComplete = totalDrawsInCycle > 0 && state.settledBalls.length >= totalDrawsInCycle;
+    startButton.disabled = state.cycleComplete;
     winnerName.textContent = result;
     state.history.unshift(result);
     drawCount.textContent = state.history.length;
@@ -579,6 +591,47 @@ function drawTitle() {
     ctx.fillText("PINBALL DRAW", board.width / 2, 34);
 }
 
+function drawRestartOverlay() {
+    if (!state.cycleComplete) {
+        state.restartButtonBounds = null;
+        return;
+    }
+
+    const buttonWidth = 230;
+    const buttonHeight = 72;
+    const x = board.width / 2 - buttonWidth / 2;
+    const y = board.top + 210;
+
+    state.restartButtonBounds = { x, y, width: buttonWidth, height: buttonHeight };
+
+    ctx.save();
+    ctx.fillStyle = "rgba(9, 12, 18, 0.48)";
+    ctx.fillRect(board.left, board.top + 115, board.right - board.left, 250);
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const gradient = ctx.createLinearGradient(x, y, x + buttonWidth, y + buttonHeight);
+    gradient.addColorStop(0, "#ffd166");
+    gradient.addColorStop(1, "#ff5ca8");
+    ctx.fillStyle = gradient;
+    ctx.shadowColor = "rgba(255, 92, 168, 0.55)";
+    ctx.shadowBlur = 24;
+    ctx.beginPath();
+    ctx.roundRect(x, y, buttonWidth, buttonHeight, 18);
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255,255,255,0.68)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#101114";
+    ctx.font = "900 30px system-ui, sans-serif";
+    ctx.fillText("다시하기", board.width / 2, y + buttonHeight / 2);
+    ctx.restore();
+}
+
 function draw() {
     ctx.clearRect(0, 0, board.width, board.height);
     drawBackground();
@@ -589,6 +642,7 @@ function draw() {
     drawSettledBalls();
     drawBallTrail();
     drawBall();
+    drawRestartOverlay();
 }
 
 function renderHistory() {
@@ -614,15 +668,63 @@ function shuffleInput() {
     syncEntries();
 }
 
+function restartCycle() {
+    state.settledBalls = [];
+    state.drawnLabels = [];
+    state.cycleComplete = false;
+    state.restartButtonBounds = null;
+    startButton.disabled = false;
+    winnerName.textContent = "대기 중";
+    draw();
+}
+
+function canvasPoint(event) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+        x: (event.clientX - rect.left) * scaleX,
+        y: (event.clientY - rect.top) * scaleY,
+    };
+}
+
+function pointInBounds(point, bounds) {
+    return (
+        bounds &&
+        point.x >= bounds.x &&
+        point.x <= bounds.x + bounds.width &&
+        point.y >= bounds.y &&
+        point.y <= bounds.y + bounds.height
+    );
+}
+
 nameInput.addEventListener("input", syncEntries);
 duplicateToggle.addEventListener("change", () => {
     state.drawnLabels = [];
     state.settledBalls = [];
+    state.cycleComplete = false;
+    state.restartButtonBounds = null;
+    startButton.disabled = false;
     updateListStatus();
     draw();
 });
 shuffleButton.addEventListener("click", shuffleInput);
 startButton.addEventListener("click", launchBall);
+canvas.addEventListener("click", (event) => {
+    if (!state.cycleComplete || !pointInBounds(canvasPoint(event), state.restartButtonBounds)) {
+        return;
+    }
+
+    restartCycle();
+});
+canvas.addEventListener("mousemove", (event) => {
+    const isOverRestart = state.cycleComplete && pointInBounds(canvasPoint(event), state.restartButtonBounds);
+    canvas.style.cursor = isOverRestart ? "pointer" : "default";
+});
+canvas.addEventListener("mouseleave", () => {
+    canvas.style.cursor = "default";
+});
 clearHistoryButton.addEventListener("click", () => {
     state.history = [];
     drawCount.textContent = "0";
