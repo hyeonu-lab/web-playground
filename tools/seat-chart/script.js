@@ -1,16 +1,26 @@
 const STORAGE_KEY = "web-playground-seat-chart";
-const STORAGE_VERSION = 5;
+const STORAGE_VERSION = 6;
 const SHUFFLE_DURATION = 1000;
 const SHUFFLE_ROUNDS = 3;
+const DEFAULT_GROUP_COUNT = 2;
+const DEFAULT_COLS = 2;
+const DEFAULT_ROWS = 5;
+
+function defaultSeatNames() {
+    return Array.from(
+        { length: DEFAULT_GROUP_COUNT * DEFAULT_COLS * DEFAULT_ROWS },
+        (_, index) => String(index + 1),
+    ).join("\n");
+}
 
 // 기본 설정은 localStorage에 저장된 값이 없거나 저장 버전이 바뀐 경우에만 사용된다.
 const defaultState = {
     storageVersion: STORAGE_VERSION,
     title: "학급 명을 입력해주세요",
-    names: "",
-    groupCount: 2,
-    cols: 2,
-    rows: 5,
+    names: defaultSeatNames(),
+    groupCount: DEFAULT_GROUP_COUNT,
+    cols: DEFAULT_COLS,
+    rows: DEFAULT_ROWS,
     shuffledNames: [],
     revealMode: false,
     revealedSeats: [],
