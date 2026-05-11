@@ -34,6 +34,95 @@ const state = {
     drawnLabels: [],
 };
 
+let audioContext = null;
+
+function ensureAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if (audioContext.state === "suspended") {
+        audioContext.resume();
+    }
+}
+
+function playBounceSound() {
+    if (!audioContext) {
+        return;
+    }
+
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
+
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(760 + Math.random() * 260, now);
+    oscillator.frequency.exponentialRampToValueAtTime(360 + Math.random() * 120, now + 0.08);
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(1200, now);
+    filter.Q.setValueAtTime(6, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+    oscillator.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.1);
+}
+
+function playRollInSound() {
+    if (!audioContext) {
+        return;
+    }
+
+    const now = audioContext.currentTime;
+    const duration = 0.48;
+    const bufferSize = audioContext.sampleRate * duration;
+    const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let index = 0; index < bufferSize; index += 1) {
+        const progress = index / bufferSize;
+        const tick = Math.sin(progress * Math.PI * 64) > 0.76 ? 1 : 0;
+        data[index] = (Math.random() * 2 - 1) * tick * (1 - progress);
+    }
+
+    const noise = audioContext.createBufferSource();
+    const filter = audioContext.createBiquadFilter();
+    const gain = audioContext.createGain();
+    const rumble = audioContext.createOscillator();
+    const rumbleGain = audioContext.createGain();
+
+    noise.buffer = buffer;
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(520, now);
+    filter.frequency.exponentialRampToValueAtTime(160, now + duration);
+    filter.Q.setValueAtTime(3.5, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.11, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    rumble.type = "sine";
+    rumble.frequency.setValueAtTime(120, now);
+    rumble.frequency.exponentialRampToValueAtTime(62, now + duration);
+    rumbleGain.gain.setValueAtTime(0.0001, now);
+    rumbleGain.gain.exponentialRampToValueAtTime(0.045, now + 0.04);
+    rumbleGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioContext.destination);
+    rumble.connect(rumbleGain);
+    rumbleGain.connect(audioContext.destination);
+    noise.start(now);
+    rumble.start(now);
+    noise.stop(now + duration);
+    rumble.stop(now + duration);
+}
+
 function rawEntryItems() {
     return nameInput.value
         .split(/\n|,/)
@@ -237,6 +326,7 @@ function buildBouncePath(endX, endY) {
 }
 
 function launchBall() {
+    ensureAudioContext();
     const winner = pickWinner();
 
     if (!winner || state.running) {
@@ -268,6 +358,8 @@ function launchBall() {
         start: performance.now(),
         duration: 3100,
         trail: [],
+        lastBounceIndex: -1,
+        rollSoundPlayed: false,
         squash: 1,
         x: points[0].x,
         y: points[0].y,
@@ -290,6 +382,7 @@ function ballPosition(ball, now) {
 
     return {
         progress,
+        index,
         x: current.x + (next.x - current.x) * local + jitter,
         y: current.y + (next.y - current.y) * local - bounce * 16 - landingBounce,
         squash: 1 + bounce * 0.12,
@@ -326,6 +419,16 @@ function animate(now = performance.now()) {
     }
 
     const position = ballPosition(state.ball, now);
+    if (position.index > 0 && position.index < state.ball.points.length - 2 && position.index !== state.ball.lastBounceIndex) {
+        state.ball.lastBounceIndex = position.index;
+        playBounceSound();
+    }
+
+    if (!state.ball.rollSoundPlayed && position.progress > 0.88) {
+        state.ball.rollSoundPlayed = true;
+        playRollInSound();
+    }
+
     state.ball.x = position.x;
     state.ball.y = position.y;
     state.ball.squash = position.squash;
