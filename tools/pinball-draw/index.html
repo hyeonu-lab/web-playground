@@ -28,15 +28,20 @@
             <aside class="control-panel">
                 <section class="panel-card">
                     <label for="nameInput">뽑기 목록</label>
-                    <textarea id="nameInput" spellcheck="false">김민준
-이서연
-박지후
+                    <textarea id="nameInput" spellcheck="false">김민서
+이서준
+박지우
 최하린
-정도윤
-한유나
 발표 1모둠
 발표 2모둠</textarea>
-                    <p class="hint">한 줄에 하나씩 입력합니다. <code>이름*2</code>처럼 쓰면 확률을 높일 수 있습니다.</p>
+                    <div class="option-row">
+                        <label class="switch-control">
+                            <input id="duplicateToggle" type="checkbox" checked>
+                            <span>중복 허용</span>
+                        </label>
+                        <span id="duplicateModeText">중복 가능</span>
+                    </div>
+                    <p id="listStatus" class="hint">최대 8명까지 입력할 수 있습니다. <code>이름*2</code>처럼 쓰면 확률을 높일 수 있습니다.</p>
                 </section>
 
                 <div class="button-row">
