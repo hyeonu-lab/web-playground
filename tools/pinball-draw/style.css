@@ -23,7 +23,7 @@ body {
     background:
         radial-gradient(circle at 20% 0%, rgba(57, 213, 255, 0.16), transparent 26rem),
         linear-gradient(180deg, #151821, var(--bg));
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
 }
 
 button,
