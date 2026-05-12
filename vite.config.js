@@ -6,6 +6,7 @@ export default {
       input: {
         main: resolve(__dirname, "index.html"),
         seatChart: resolve(__dirname, "tools/seat-chart/index.html"),
+        roulette: resolve(__dirname, "tools/roulette/index.html"),
         pinballDraw: resolve(__dirname, "tools/pinball-draw/index.html"),
       },
     },

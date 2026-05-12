@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>당첨 룰렛</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <a class="brand" href="../../index.html#home" aria-label="교실친구 홈">
+            <span class="brand-mark" aria-hidden="true">A</span>
+            <span class="brand-name">교실친구</span>
+        </a>
+
+        <nav class="site-nav" aria-label="주요 기능">
+            <a href="../seat-chart/index.html">자리바꾸기</a>
+            <a href="index.html" aria-current="page">룰렛</a>
+            <a href="../../index.html#ladder">사다리타기</a>
+            <a href="../pinball-draw/index.html">공 뽑기</a>
+        </nav>
+    </header>
+
+    <main class="roulette-app">
+        <section class="tool-header">
+            <div>
+                <p class="eyebrow">Random roulette</p>
+                <h1>당첨 룰렛</h1>
+                <p>당첨과 꽝을 원하는 개수만큼 넣고 룰렛을 돌려 결과를 뽑습니다.</p>
+            </div>
+            <div id="resultCard" class="result-card" aria-live="polite">
+                <span>결과</span>
+                <strong id="resultText">대기 중</strong>
+                <p id="resultBadge" class="result-badge">READY</p>
+                <p id="resultNote" class="result-note">돌리기 버튼을 누르면 결과가 여기에 크게 표시됩니다.</p>
+            </div>
+        </section>
+
+        <section class="tool-layout">
+            <section class="wheel-card" aria-label="룰렛">
+                <div class="wheel-wrap">
+                    <canvas id="rouletteCanvas" width="760" height="760"></canvas>
+                    <div class="wheel-pointer" aria-hidden="true"></div>
+                </div>
+            </section>
+
+            <aside class="control-panel">
+                <section class="panel-card">
+                    <label for="itemInput">룰렛 항목</label>
+                    <textarea id="itemInput" spellcheck="false">당첨
+꽝
+꽝
+꽝
+꽝
+꽝</textarea>
+                    <p id="listStatus" class="hint">줄마다 하나씩 입력하세요. 같은 항목을 여러 줄 넣으면 확률이 올라갑니다.</p>
+                </section>
+
+                <div class="button-row">
+                    <button id="resetButton" class="button ghost" type="button">기본값</button>
+                    <button id="spinButton" class="button primary" type="button">돌리기</button>
+                </div>
+
+                <section class="panel-card compact">
+                    <div class="stat-row">
+                        <span>항목 수</span>
+                        <strong id="itemCount">0</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>당첨 확률</span>
+                        <strong id="winRate">0%</strong>
+                    </div>
+                </section>
+
+                <section class="panel-card">
+                    <div class="history-heading">
+                        <h2>기록</h2>
+                        <button id="clearHistoryButton" class="text-button" type="button">초기화</button>
+                    </div>
+                    <ol id="historyList" class="history-list"></ol>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
