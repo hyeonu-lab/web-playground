@@ -3,27 +3,33 @@
 }
 
 :root {
-    --bg: #101114;
-    --panel: #1a1d24;
-    --panel-soft: #232935;
-    --text: #f7f9fc;
-    --muted: #a8b0bf;
-    --line: rgba(255, 255, 255, 0.13);
-    --lime: #b6f24a;
-    --cyan: #39d5ff;
-    --amber: #ffd166;
-    --pink: #ff5ca8;
-    --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+    --cream: #fff4dc;
+    --cream-deep: #f3dfb8;
+    --chalk: #315f44;
+    --chalk-soft: #6c9b60;
+    --wood: #b77a45;
+    --wood-dark: #7c4a2b;
+    --paper: #fff9ed;
+    --ink: #3b2a1d;
+    --muted: #846f5a;
+    --line: rgba(126, 88, 47, 0.18);
+    --yellow: #f7d873;
+    --shadow: 0 22px 55px rgba(86, 57, 24, 0.18);
 }
 
 body {
     min-height: 100vh;
     margin: 0;
-    color: var(--text);
+    color: var(--ink);
     background:
-        radial-gradient(circle at 20% 0%, rgba(57, 213, 255, 0.16), transparent 26rem),
-        linear-gradient(180deg, #151821, var(--bg));
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.84), transparent 22rem),
+        linear-gradient(180deg, #fff8e9, var(--cream));
     font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
 button,
@@ -35,9 +41,87 @@ button {
     cursor: pointer;
 }
 
+.site-header,
 .pinball-app {
     width: min(1160px, calc(100% - 24px));
     margin: 0 auto;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 14px 0;
+    backdrop-filter: blur(18px);
+}
+
+.site-header::before {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: 68px;
+    content: "";
+    background: rgba(255, 248, 233, 0.88);
+    border-bottom: 1px solid rgba(126, 88, 47, 0.14);
+}
+
+.brand,
+.site-nav {
+    display: inline-flex;
+    align-items: center;
+}
+
+.brand {
+    gap: 0.75rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.brand-mark {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    color: #fffdf7;
+    background: var(--chalk);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(49, 95, 68, 0.18);
+}
+
+.brand-name {
+    font-size: 1.02rem;
+}
+
+.site-nav {
+    gap: 0.2rem;
+    padding: 5px;
+    color: var(--muted);
+    background: rgba(255, 249, 237, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+}
+
+.site-nav a {
+    padding: 0.62rem 0.78rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a[aria-current="page"] {
+    color: #fffdf7;
+    background: var(--chalk);
+    outline: 0;
+}
+
+.pinball-app {
     padding: clamp(1rem, 3vw, 2rem) 0;
 }
 
@@ -51,7 +135,7 @@ button {
 
 .eyebrow {
     margin: 0 0 0.7rem;
-    color: var(--lime);
+    color: var(--chalk-soft);
     font-size: 0.76rem;
     font-weight: 900;
     letter-spacing: 0.14em;
@@ -91,7 +175,7 @@ h2 {
 .machine-card,
 .panel-card,
 .winner-card {
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 249, 237, 0.9);
     border: 1px solid var(--line);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -107,7 +191,7 @@ h2 {
     width: 100%;
     height: auto;
     min-height: 620px;
-    background: var(--panel);
+    background: var(--chalk);
     border-radius: 6px;
 }
 
@@ -127,7 +211,7 @@ label,
 }
 
 .winner-card strong {
-    color: var(--amber);
+    color: var(--wood-dark);
     font-size: clamp(1.5rem, 4vw, 2.3rem);
     line-height: 1.1;
     overflow-wrap: anywhere;
@@ -149,8 +233,8 @@ textarea {
     min-height: 220px;
     resize: vertical;
     padding: 0.85rem;
-    color: var(--text);
-    background: rgba(0, 0, 0, 0.22);
+    color: var(--ink);
+    background: #fffdf7;
     border: 1px solid var(--line);
     border-radius: 8px;
     outline: none;
@@ -158,12 +242,12 @@ textarea {
 }
 
 textarea:focus {
-    border-color: rgba(57, 213, 255, 0.65);
-    box-shadow: 0 0 0 3px rgba(57, 213, 255, 0.12);
+    border-color: rgba(108, 155, 96, 0.68);
+    box-shadow: 0 0 0 4px rgba(108, 155, 96, 0.12);
 }
 
 code {
-    color: var(--cyan);
+    color: var(--chalk);
 }
 
 .option-row {
@@ -172,7 +256,7 @@ code {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.75rem 0.85rem;
-    background: rgba(0, 0, 0, 0.16);
+    background: rgba(255, 255, 255, 0.46);
     border: 1px solid var(--line);
     border-radius: 8px;
 }
@@ -181,17 +265,17 @@ code {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    color: var(--text);
+    color: var(--ink);
 }
 
 .switch-control input {
     width: 18px;
     height: 18px;
-    accent-color: var(--lime);
+    accent-color: var(--chalk-soft);
 }
 
 #duplicateModeText {
-    color: var(--amber);
+    color: var(--wood-dark);
     font-size: 0.82rem;
     font-weight: 900;
     white-space: nowrap;
@@ -212,13 +296,14 @@ code {
 }
 
 .button.primary {
-    color: #101114;
-    background: var(--lime);
+    color: #fffdf7;
+    background: var(--chalk-soft);
+    box-shadow: 0 6px 0 #4f7748;
 }
 
 .button.ghost {
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink);
+    background: #fffdf7;
     border-color: var(--line);
 }
 
@@ -245,7 +330,7 @@ code {
 
 .text-button {
     padding: 0;
-    color: var(--cyan);
+    color: var(--chalk);
     background: transparent;
     border: 0;
     font-size: 0.86rem;
@@ -264,10 +349,24 @@ code {
 }
 
 .history-list strong {
-    color: var(--text);
+    color: var(--ink);
 }
 
 @media (max-width: 880px) {
+    .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .site-header::before {
+        height: 120px;
+    }
+
+    .site-nav {
+        width: 100%;
+        overflow-x: auto;
+    }
+
     .tool-header,
     .tool-layout {
         grid-template-columns: 1fr;

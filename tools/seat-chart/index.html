@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header class="site-header">
+        <a class="brand" href="../../index.html" aria-label="교실도구 홈">
+            <span class="brand-mark" aria-hidden="true">A</span>
+            <span class="brand-name">교실도구</span>
+        </a>
+
+        <nav class="site-nav" aria-label="주요 기능">
+            <a href="index.html" aria-current="page">자리바꾸기</a>
+            <a href="../../index.html#roulette">룰렛</a>
+            <a href="../../index.html#ladder">사다리타기</a>
+            <a href="../pinball-draw/index.html">핀볼 추첨기</a>
+        </nav>
+    </header>
+
     <main class="classroom-app">
         <section class="classroom-stage" aria-label="자리바꾸기표 미리보기">
             <header class="classroom-board">
@@ -31,7 +45,6 @@
 
             <section id="seatArea" class="seat-area" aria-label="학생 좌석 배치"></section>
 
-            <section id="unassignedArea" class="unassigned-area" aria-label="배치되지 않은 학생"></section>
         </section>
 
         <aside class="classroom-panel" aria-label="자리표 설정">

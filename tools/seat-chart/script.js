@@ -1,5 +1,5 @@
 const STORAGE_KEY = "web-playground-seat-chart";
-const STORAGE_VERSION = 6;
+const STORAGE_VERSION = 7;
 const SHUFFLE_DURATION = 1000;
 const SHUFFLE_ROUNDS = 3;
 const DEFAULT_GROUP_COUNT = 2;
@@ -7,10 +7,11 @@ const DEFAULT_COLS = 2;
 const DEFAULT_ROWS = 5;
 
 function defaultSeatNames() {
-    return Array.from(
-        { length: DEFAULT_GROUP_COUNT * DEFAULT_COLS * DEFAULT_ROWS },
-        (_, index) => String(index + 1),
-    ).join("\n");
+    return seatNamesForCount(DEFAULT_GROUP_COUNT * DEFAULT_COLS * DEFAULT_ROWS).join("\n");
+}
+
+function seatNamesForCount(count) {
+    return Array.from({ length: count }, (_, index) => String(index + 1));
 }
 
 // 기본 설정은 localStorage에 저장된 값이 없거나 저장 버전이 바뀐 경우에만 사용된다.
@@ -38,7 +39,6 @@ const elements = {
     printButton: document.querySelector("#printButton"),
     resetButton: document.querySelector("#resetButton"),
     seatArea: document.querySelector("#seatArea"),
-    unassignedArea: document.querySelector("#unassignedArea"),
     statusMessage: document.querySelector("#statusMessage"),
 };
 
@@ -139,6 +139,29 @@ function assignedNames() {
         .filter(Boolean);
 }
 
+function fitNamesToSeatCount(names, seats) {
+    const result = names
+        .map((name) => name.trim())
+        .filter(Boolean)
+        .slice(0, seats);
+
+    while (result.length < seats) {
+        result.push(String(result.length + 1));
+    }
+
+    return result;
+}
+
+function syncNamesToSeatCount() {
+    const seats = totalSeatCount();
+    const source = currentSeatSource();
+    const fittedNames = fitNamesToSeatCount(source, seats);
+
+    state.names = fittedNames.join("\n");
+    state.shuffledNames = state.shuffledNames.length > 0 ? fittedNames : [];
+    elements.studentNamesInput.value = state.names;
+}
+
 // -----------------------------
 // Input/state sync
 // -----------------------------
@@ -170,15 +193,13 @@ function syncStateFromInputs({ commitNumbers = false } = {}) {
 // -----------------------------
 
 function seatAssignments() {
-    const names = assignedNames();
-    const sourceNames = currentSeatSource();
+    const sourceNames = fitNamesToSeatCount(currentSeatSource(), totalSeatCount());
+    const names = sourceNames.filter(Boolean);
     const seats = totalSeatCount();
 
     return {
         names,
         placed: sourceNames.slice(0, seats),
-        unassigned: sourceNames.slice(seats),
-        emptyCount: Math.max(0, seats - sourceNames.length),
         seats,
     };
 }
@@ -245,34 +266,9 @@ function renderSeats() {
     }
 }
 
-function renderUnassigned() {
-    const { unassigned } = seatAssignments();
-    elements.unassignedArea.innerHTML = "";
-    elements.unassignedArea.classList.toggle("visible", unassigned.length > 0);
-
-    if (unassigned.length === 0) {
-        return;
-    }
-
-    const title = document.createElement("p");
-    const list = document.createElement("ul");
-
-    title.className = "unassigned-title";
-    title.textContent = "배치되지 않은 학생";
-    list.className = "unassigned-list";
-
-    unassigned.forEach((name) => {
-        const item = document.createElement("li");
-        item.textContent = name;
-        list.append(item);
-    });
-
-    elements.unassignedArea.append(title, list);
-}
-
 function renderStatus() {
-    const { names, unassigned, emptyCount, seats } = seatAssignments();
-    elements.statusMessage.classList.toggle("warning", unassigned.length > 0);
+    const { names, seats } = seatAssignments();
+    elements.statusMessage.classList.remove("warning");
 
     if (isShuffling) {
         elements.statusMessage.textContent = "카드를 뒤집어 섞고 있습니다.";
@@ -284,27 +280,11 @@ function renderStatus() {
         return;
     }
 
-    if (names.length === 0) {
-        elements.statusMessage.textContent = "책상에 직접 학생 이름을 입력하면 자리표가 생성됩니다.";
-        return;
-    }
-
-    if (unassigned.length > 0) {
-        elements.statusMessage.textContent = `좌석 ${seats}개보다 학생이 ${unassigned.length}명 더 많습니다. 아래에 배치되지 않은 학생을 흐리게 표시했습니다.`;
-        return;
-    }
-
-    if (emptyCount > 0) {
-        elements.statusMessage.textContent = `학생 ${names.length}명을 배치했습니다. 남은 ${emptyCount}개 좌석은 빈자리로 표시됩니다.`;
-        return;
-    }
-
-    elements.statusMessage.textContent = `학생 ${names.length}명이 모든 좌석에 배치되었습니다.`;
+    elements.statusMessage.textContent = `책상 ${seats}개에 맞춰 학생 ${names.length}명이 자동으로 배치되었습니다.`;
 }
 
 function render() {
     renderSeats();
-    renderUnassigned();
     renderStatus();
 }
 
@@ -387,13 +367,7 @@ function handleSettingChange() {
     syncStateFromInputs();
     state.revealMode = false;
     state.revealedSeats = [];
-
-    const names = assignedNames();
-    const currentNames = new Set(names);
-    const keptNames = state.shuffledNames.filter((name) => currentNames.has(name));
-    const keptSet = new Set(keptNames);
-    const addedNames = names.filter((name) => !keptSet.has(name));
-    state.shuffledNames = state.shuffledNames.length > 0 ? [...keptNames, ...addedNames] : [];
+    syncNamesToSeatCount();
     saveState();
     render();
 }
@@ -408,6 +382,7 @@ function handleNumberCommit() {
     syncStateFromInputs({ commitNumbers: true });
     state.revealMode = false;
     state.revealedSeats = [];
+    syncNamesToSeatCount();
     saveState();
     render();
 }
@@ -428,7 +403,7 @@ function handleShuffle() {
 
     const source = currentSeatSource();
     const seats = totalSeatCount();
-    const seatOrder = Array.from({ length: Math.max(source.length, seats) }, (_, index) => source[index] || "");
+    const seatOrder = fitNamesToSeatCount(source, seats);
     isShuffling = true;
     state.revealMode = true;
     state.revealedSeats = [];
@@ -469,9 +444,9 @@ function handleDeskInputChange(input) {
     const seatIndex = Number(input.dataset.seatIndex);
     const seats = totalSeatCount();
     const source = currentSeatSource();
-    const nextOrder = Array.from({ length: Math.max(source.length, seats) }, (_, index) => source[index] || "");
+    const nextOrder = fitNamesToSeatCount(source, seats);
 
-    nextOrder[seatIndex] = input.value.trim();
+    nextOrder[seatIndex] = input.value.trim() || String(seatIndex + 1);
     state.shuffledNames = normalizeSeatOrder(nextOrder);
     state.revealMode = false;
     state.revealedSeats = [];
@@ -547,4 +522,6 @@ elements.seatArea.addEventListener("keydown", (event) => {
 });
 
 syncInputsFromState();
+syncNamesToSeatCount();
+saveState();
 render();

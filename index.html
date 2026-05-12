@@ -18,7 +18,6 @@
             <a href="#roulette">룰렛</a>
             <a href="#ladder">사다리타기</a>
             <a href="#pinball">핀볼 추첨기</a>
-            <a href="#omok">오목</a>
         </nav>
     </header>
 
@@ -35,7 +34,7 @@
                 <div class="art-board">
                     <span class="art-chip chip-lime">자리</span>
                     <span class="art-chip chip-dark">추첨</span>
-                    <span class="art-chip chip-soft">놀이</span>
+                    <span class="art-chip chip-soft">도구</span>
                     <div class="art-orbit">
                         <span></span>
                         <span></span>
@@ -47,7 +46,7 @@
 
         <section class="feature-section" id="features" aria-labelledby="featureTitle">
             <div class="section-heading">
-                <p class="eyebrow">Tools and games</p>
+                <p class="eyebrow">Classroom tools</p>
                 <h2 id="featureTitle">기능 목록</h2>
             </div>
 
@@ -56,7 +55,7 @@
                     <span class="tag tag-tool">Tool</span>
                     <h3>자리바꾸기</h3>
                     <p>학생 이름과 조건을 입력해 교실 자리표를 빠르게 만듭니다.</p>
-                    <button type="button" data-game-src="tools/seat-chart/index.html" data-game-title="자리바꾸기">실행하기</button>
+                    <a class="tool-link" href="tools/seat-chart/index.html">실행하기</a>
                 </article>
 
                 <article class="feature-card muted-card" id="roulette">
@@ -77,30 +76,10 @@
                     <span class="tag tag-tool">Tool</span>
                     <h3>핀볼 추첨기</h3>
                     <p>이름이나 항목을 넣고 공을 떨어뜨려 무작위로 추첨합니다.</p>
-                    <button type="button" data-game-src="tools/pinball-draw/index.html" data-game-title="핀볼 추첨기">실행하기</button>
+                    <a class="tool-link" href="tools/pinball-draw/index.html">실행하기</a>
                 </article>
-
-                <article class="feature-card" id="omok">
-                    <span class="tag tag-game">Game</span>
-                    <h3>오목</h3>
-                    <p>쉬는 시간이나 활동 마무리에 바로 실행할 수 있는 오목 게임입니다.</p>
-                    <button type="button" data-game-src="games/omok/index.html" data-game-title="오목">실행하기</button>
-                </article>
-            </div>
-        </section>
-
-        <section class="play-section" id="play" aria-labelledby="playTitle">
-            <div class="section-heading play-heading">
-                <p class="eyebrow">Now playing</p>
-                <h2 id="playTitle">오목</h2>
-            </div>
-
-            <div class="frame-card">
-                <iframe id="gameFrame" src="games/omok/index.html" title="기능 실행 화면"></iframe>
             </div>
         </section>
     </main>
-
-    <script src="script.js"></script>
 </body>
 </html>

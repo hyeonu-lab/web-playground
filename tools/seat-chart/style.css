@@ -28,7 +28,10 @@ body {
     font-family: "Malgun Gothic", "맑은 고딕", "Apple SD Gothic Neo", "Segoe UI", sans-serif;
 }
 
-/* Base layout */
+a {
+    color: inherit;
+    text-decoration: none;
+}
 
 button,
 input,
@@ -40,13 +43,91 @@ button {
     cursor: pointer;
 }
 
+.site-header,
+.classroom-app {
+    width: min(1440px, calc(100% - 40px));
+    margin: 0 auto;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 14px 0;
+    backdrop-filter: blur(18px);
+}
+
+.site-header::before {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: -1;
+    height: 68px;
+    content: "";
+    background: rgba(255, 248, 233, 0.86);
+    border-bottom: 1px solid rgba(126, 88, 47, 0.14);
+}
+
+.brand,
+.site-nav {
+    display: inline-flex;
+    align-items: center;
+}
+
+.brand {
+    gap: 0.75rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.brand-mark {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    color: #fffdf7;
+    background: var(--chalk);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(49, 95, 68, 0.18);
+}
+
+.brand-name {
+    font-size: 1.02rem;
+}
+
+.site-nav {
+    gap: 0.2rem;
+    padding: 5px;
+    color: var(--muted);
+    background: rgba(255, 249, 237, 0.82);
+    border: 1px solid rgba(126, 88, 47, 0.18);
+    border-radius: 999px;
+}
+
+.site-nav a {
+    padding: 0.62rem 0.78rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.site-nav a[aria-current="page"] {
+    color: #fffdf7;
+    background: var(--chalk);
+    outline: 0;
+}
+
 .classroom-app {
     display: grid;
     grid-template-columns: minmax(780px, 1fr) 340px;
     gap: 24px;
-    width: min(1440px, calc(100% - 40px));
     min-height: 100vh;
-    margin: 0 auto;
     padding: 24px 0;
 }
 
@@ -372,45 +453,6 @@ button {
     box-shadow: 0 0 0 3px rgba(255, 249, 237, 0.72);
 }
 
-/* Overflow students */
-
-.unassigned-area {
-    display: none;
-    gap: 10px;
-    padding: 14px 18px;
-    color: rgba(59, 42, 29, 0.58);
-    background: rgba(255, 255, 255, 0.48);
-    border: 2px dashed rgba(156, 77, 47, 0.28);
-    border-radius: 8px;
-}
-
-.unassigned-area.visible {
-    display: grid;
-}
-
-.unassigned-title {
-    margin: 0;
-    color: var(--warning);
-    font-weight: 900;
-}
-
-.unassigned-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.unassigned-list li {
-    padding: 7px 10px;
-    background: rgba(255, 255, 255, 0.66);
-    border-radius: 999px;
-    filter: blur(0.2px);
-    opacity: 0.42;
-}
-
 /* Settings panel */
 
 .classroom-panel {
@@ -548,6 +590,22 @@ button {
     }
 }
 
+@media (max-width: 760px) {
+    .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .site-header::before {
+        height: 120px;
+    }
+
+    .site-nav {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
+
 @media print {
     @page {
         size: A4 landscape;
@@ -566,6 +624,7 @@ button {
         padding: 0;
     }
 
+    .site-header,
     .classroom-panel {
         display: none;
     }
@@ -606,7 +665,4 @@ button {
         gap: 8px;
     }
 
-    .unassigned-area {
-        break-inside: avoid;
-    }
 }

@@ -460,12 +460,12 @@ function animate(now = performance.now()) {
 
 function drawBackground() {
     const gradient = ctx.createLinearGradient(0, 0, 0, board.height);
-    gradient.addColorStop(0, "#222936");
-    gradient.addColorStop(1, "#12151d");
+    gradient.addColorStop(0, "#fff5df");
+    gradient.addColorStop(1, "#f3dfb8");
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, board.width, board.height);
 
-    ctx.strokeStyle = "rgba(255,255,255,0.16)";
+    ctx.strokeStyle = "rgba(126, 88, 47, 0.16)";
     ctx.lineWidth = 4;
     ctx.strokeRect(board.left, 30, board.right - board.left, board.height - 62);
 }
@@ -479,16 +479,16 @@ function drawPins() {
 
         ctx.beginPath();
         ctx.arc(pin.x, pin.y, isNearBall ? 10 : 8, 0, Math.PI * 2);
-        ctx.fillStyle = isNearBall ? "#ffffff" : "#dfe7f2";
+        ctx.fillStyle = isNearBall ? "#fffdf7" : "#e9b47a";
         ctx.fill();
-        ctx.strokeStyle = isNearBall ? "rgba(255, 209, 102, 0.86)" : "rgba(57, 213, 255, 0.55)";
+        ctx.strokeStyle = isNearBall ? "rgba(247, 216, 115, 0.88)" : "rgba(49, 95, 68, 0.42)";
         ctx.lineWidth = isNearBall ? 5 : 3;
         ctx.stroke();
 
         if (isNearBall) {
             ctx.beginPath();
             ctx.arc(pin.x, pin.y, 18 + (34 - distance) * 0.22, 0, Math.PI * 2);
-            ctx.strokeStyle = "rgba(255, 209, 102, 0.28)";
+            ctx.strokeStyle = "rgba(183, 122, 69, 0.28)";
             ctx.lineWidth = 2;
             ctx.stroke();
         }
@@ -501,10 +501,10 @@ function drawSlots() {
     ctx.textBaseline = "middle";
 
     slots.forEach((slot, index) => {
-        const hue = index % 2 === 0 ? "rgba(182, 242, 74, 0.16)" : "rgba(57, 213, 255, 0.14)";
+        const hue = index % 2 === 0 ? "rgba(108, 155, 96, 0.16)" : "rgba(247, 216, 115, 0.18)";
         ctx.fillStyle = hue;
         ctx.fillRect(slot.x, board.slotTop, slot.width, 108);
-        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.strokeStyle = "rgba(126, 88, 47, 0.18)";
         ctx.lineWidth = 2;
         ctx.strokeRect(slot.x, board.slotTop, slot.width, 108);
 
@@ -512,7 +512,7 @@ function drawSlots() {
         ctx.beginPath();
         ctx.rect(slot.x + 6, board.slotTop + 8, slot.width - 12, 92);
         ctx.clip();
-        ctx.fillStyle = "#f7f9fc";
+        ctx.fillStyle = "#3b2a1d";
         ctx.font = "800 18px system-ui, sans-serif";
         ctx.fillText(slot.label, slot.x + slot.width / 2, board.slotTop + 38, slot.width - 20);
         ctx.restore();
@@ -520,7 +520,7 @@ function drawSlots() {
 }
 
 function drawGuides() {
-    ctx.strokeStyle = "rgba(255, 209, 102, 0.6)";
+    ctx.strokeStyle = "rgba(124, 74, 43, 0.5)";
     ctx.lineWidth = 5;
     ctx.lineCap = "round";
     ctx.beginPath();
@@ -537,14 +537,14 @@ function drawBallAt(x, y, radius = 18, glow = 0.32, squash = 1) {
     ctx.scale(squash, 1 / squash);
 
     const gradient = ctx.createRadialGradient(-7, -7, 2, 0, 0, 20);
-    gradient.addColorStop(0, "#ffffff");
-    gradient.addColorStop(0.32, "#ffd166");
-    gradient.addColorStop(1, "#ff5ca8");
+    gradient.addColorStop(0, "#fffdf7");
+    gradient.addColorStop(0.32, "#f7d873");
+    gradient.addColorStop(1, "#b77a45");
 
     ctx.beginPath();
     ctx.arc(0, 0, radius, 0, Math.PI * 2);
     ctx.fillStyle = gradient;
-    ctx.shadowColor = `rgba(255, 92, 168, ${glow})`;
+    ctx.shadowColor = `rgba(183, 122, 69, ${glow})`;
     ctx.shadowBlur = 22;
     ctx.fill();
     ctx.restore();
@@ -562,7 +562,7 @@ function drawBallTrail() {
 
         ctx.beginPath();
         ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 209, 102, ${alpha})`;
+        ctx.fillStyle = `rgba(247, 216, 115, ${alpha})`;
         ctx.fill();
     });
 }
@@ -586,7 +586,7 @@ function drawBall() {
 
 function drawTitle() {
     ctx.textAlign = "center";
-    ctx.fillStyle = "#f7f9fc";
+    ctx.fillStyle = "#3b2a1d";
     ctx.font = "900 34px system-ui, sans-serif";
     ctx.fillText("PINBALL DRAW", board.width / 2, 34);
 }
@@ -605,28 +605,28 @@ function drawRestartOverlay() {
     state.restartButtonBounds = { x, y, width: buttonWidth, height: buttonHeight };
 
     ctx.save();
-    ctx.fillStyle = "rgba(9, 12, 18, 0.48)";
+    ctx.fillStyle = "rgba(255, 249, 237, 0.72)";
     ctx.fillRect(board.left, board.top + 115, board.right - board.left, 250);
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     const gradient = ctx.createLinearGradient(x, y, x + buttonWidth, y + buttonHeight);
-    gradient.addColorStop(0, "#ffd166");
-    gradient.addColorStop(1, "#ff5ca8");
+    gradient.addColorStop(0, "#f7d873");
+    gradient.addColorStop(1, "#b77a45");
     ctx.fillStyle = gradient;
-    ctx.shadowColor = "rgba(255, 92, 168, 0.55)";
+    ctx.shadowColor = "rgba(183, 122, 69, 0.45)";
     ctx.shadowBlur = 24;
     ctx.beginPath();
     ctx.roundRect(x, y, buttonWidth, buttonHeight, 18);
     ctx.fill();
 
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(255,255,255,0.68)";
+    ctx.strokeStyle = "rgba(255,255,255,0.74)";
     ctx.lineWidth = 3;
     ctx.stroke();
 
-    ctx.fillStyle = "#101114";
+    ctx.fillStyle = "#3b2a1d";
     ctx.font = "900 30px system-ui, sans-serif";
     ctx.fillText("다시하기", board.width / 2, y + buttonHeight / 2);
     ctx.restore();
