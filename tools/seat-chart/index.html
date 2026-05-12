@@ -3,8 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>자리바꾸기표</title>
+    <meta name="description" content="학생 이름을 입력하고 분단, 줄, 행을 정해 교실 자리바꾸기와 자리배치표 만들기를 바로 실행할 수 있는 무료 웹 도구입니다.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="ko_KR">
+    <meta property="og:title" content="자리바꾸기 - 교실 자리배치표 만들기">
+    <meta property="og:description" content="학급 자리바꾸기, 무작위 좌석 섞기, 자리배치표 인쇄까지 한 화면에서 처리하세요.">
+    <title>자리바꾸기 - 교실 자리배치표 만들기</title>
     <link rel="stylesheet" href="style.css">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "자리바꾸기",
+            "applicationCategory": "EducationalApplication",
+            "operatingSystem": "Web",
+            "inLanguage": "ko-KR",
+            "description": "학생 이름과 좌석 조건을 입력해 교실 자리배치표를 만들고 무작위로 자리를 섞는 웹 도구입니다.",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "KRW"
+            }
+        }
+    </script>
 </head>
 <body>
     <header class="site-header">
@@ -22,7 +44,7 @@
     </header>
 
     <main class="classroom-app">
-        <section class="classroom-stage" aria-label="자리바꾸기표 미리보기">
+        <section class="classroom-stage" aria-label="자리바꾸기 자리배치표 미리보기">
             <header class="classroom-board">
                 <input id="classTitleInput" class="classroom-title-input" type="text" value="학급 명을 입력해주세요" aria-label="반 제목">
             </header>
@@ -44,13 +66,12 @@
             </section>
 
             <section id="seatArea" class="seat-area" aria-label="학생 좌석 배치"></section>
-
         </section>
 
-        <aside class="classroom-panel" aria-label="자리표 설정">
+        <aside class="classroom-panel" aria-label="자리바꾸기 설정">
             <div class="panel-heading">
                 <p>Classroom planner</p>
-                <h1>자리바꾸기표 만들기</h1>
+                <h1>자리바꾸기</h1>
             </div>
 
             <label class="setting-field" for="panelTitleInput">
@@ -69,11 +90,11 @@
                     <input id="groupCountInput" type="number" min="1" max="6" value="2">
                 </label>
                 <label class="setting-field" for="colsInput">
-                    <span>분단당 열 수</span>
+                    <span>분단 열</span>
                     <input id="colsInput" type="number" min="1" max="4" value="2">
                 </label>
                 <label class="setting-field" for="rowsInput">
-                    <span>분단당 행 수</span>
+                    <span>분단 행</span>
                     <input id="rowsInput" type="number" min="1" max="8" value="5">
                 </label>
             </div>
@@ -85,6 +106,12 @@
             </div>
 
             <p id="statusMessage" class="status-message" role="status" aria-live="polite"></p>
+
+            <section class="seo-copy" aria-labelledby="seatToolIntro">
+                <h2 id="seatToolIntro">교실 자리바꾸기 도구</h2>
+                <p>분단 수와 좌석 행, 열을 정하면 학생 자리를 자동으로 맞춰 배치합니다. 자리 섞기 버튼으로 무작위 자리바꾸기를 실행하고, 결과를 자리배치표로 바로 인쇄할 수 있습니다.</p>
+                <p>학급 자리 바꾸기, 모둠 자리 배치, 교실 좌석표 만들기에 사용할 수 있습니다.</p>
+            </section>
         </aside>
     </main>
 
