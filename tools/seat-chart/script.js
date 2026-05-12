@@ -45,6 +45,7 @@ const elements = {
 let state = loadState();
 let isShuffling = false;
 let shuffleTimer = null;
+let draggedSeatIndex = null;
 
 document.documentElement.style.setProperty("--shuffle-duration", `${SHUFFLE_DURATION}ms`);
 
@@ -73,11 +74,20 @@ function saveState() {
 // Data helpers
 // -----------------------------
 
-function parseNames(value) {
-    return value
+function hasExplicitEmptySeats(value) {
+    return value.split(/\n/).some((name) => name.trim() === "");
+}
+
+function parseNames(value, { keepEmptySeats = false } = {}) {
+    const names = value
         .split(/\n/)
-        .map((name) => name.trim())
-        .filter(Boolean);
+        .map((name) => name.trim());
+
+    return keepEmptySeats ? names : names.filter(Boolean);
+}
+
+function shouldKeepEmptySeats() {
+    return state.shuffledNames.length > 0 || hasExplicitEmptySeats(state.names);
 }
 
 function numberFromInput(input, min, max) {
@@ -129,7 +139,9 @@ function totalSeatCount() {
 }
 
 function currentSeatSource() {
-    const names = parseNames(state.names);
+    const names = parseNames(state.names, {
+        keepEmptySeats: shouldKeepEmptySeats(),
+    });
     return state.shuffledNames.length > 0 ? state.shuffledNames : names;
 }
 
@@ -139,10 +151,10 @@ function assignedNames() {
         .filter(Boolean);
 }
 
-function fitNamesToSeatCount(names, seats) {
+function fitNamesToSeatCount(names, seats, { keepEmptySeats = false } = {}) {
     const result = names
         .map((name) => name.trim())
-        .filter(Boolean)
+        .filter((name) => keepEmptySeats || Boolean(name))
         .slice(0, seats);
 
     while (result.length < seats) {
@@ -155,7 +167,9 @@ function fitNamesToSeatCount(names, seats) {
 function syncNamesToSeatCount() {
     const seats = totalSeatCount();
     const source = currentSeatSource();
-    const fittedNames = fitNamesToSeatCount(source, seats);
+    const fittedNames = fitNamesToSeatCount(source, seats, {
+        keepEmptySeats: shouldKeepEmptySeats(),
+    });
 
     state.names = fittedNames.join("\n");
     state.shuffledNames = state.shuffledNames.length > 0 ? fittedNames : [];
@@ -193,7 +207,9 @@ function syncStateFromInputs({ commitNumbers = false } = {}) {
 // -----------------------------
 
 function seatAssignments() {
-    const sourceNames = fitNamesToSeatCount(currentSeatSource(), totalSeatCount());
+    const sourceNames = fitNamesToSeatCount(currentSeatSource(), totalSeatCount(), {
+        keepEmptySeats: shouldKeepEmptySeats(),
+    });
     const names = sourceNames.filter(Boolean);
     const seats = totalSeatCount();
 
@@ -210,6 +226,7 @@ function createDeskCard(name, seatNumber, seatIndex) {
     card.className = name ? "desk-card" : "desk-card empty";
     card.dataset.seatIndex = String(seatIndex);
     card.dataset.studentName = name || "";
+    card.draggable = !isShuffling && !state.revealMode;
     card.setAttribute("role", "listitem");
     card.setAttribute("aria-label", name ? `${seatNumber}번 좌석 ${name}` : `${seatNumber}번 좌석 빈자리`);
 
@@ -227,6 +244,7 @@ function createDeskCard(name, seatNumber, seatIndex) {
     const input = document.createElement("input");
     input.className = "desk-name-input";
     input.type = "text";
+    input.draggable = false;
     input.value = name || "";
     input.placeholder = "빈자리";
     input.dataset.seatIndex = String(seatIndex);
@@ -297,7 +315,9 @@ function normalizeSeatOrder(list) {
 }
 
 function updateTextareaFromSeatOrder() {
-    state.names = assignedNames().join("\n");
+    state.names = fitNamesToSeatCount(currentSeatSource(), totalSeatCount(), {
+        keepEmptySeats: true,
+    }).join("\n");
     elements.studentNamesInput.value = state.names;
 }
 
@@ -403,7 +423,9 @@ function handleShuffle() {
 
     const source = currentSeatSource();
     const seats = totalSeatCount();
-    const seatOrder = fitNamesToSeatCount(source, seats);
+    const seatOrder = fitNamesToSeatCount(source, seats, {
+        keepEmptySeats: shouldKeepEmptySeats(),
+    });
     isShuffling = true;
     state.revealMode = true;
     state.revealedSeats = [];
@@ -444,9 +466,29 @@ function handleDeskInputChange(input) {
     const seatIndex = Number(input.dataset.seatIndex);
     const seats = totalSeatCount();
     const source = currentSeatSource();
-    const nextOrder = fitNamesToSeatCount(source, seats);
+    const nextOrder = fitNamesToSeatCount(source, seats, {
+        keepEmptySeats: shouldKeepEmptySeats(),
+    });
 
-    nextOrder[seatIndex] = input.value.trim() || String(seatIndex + 1);
+    nextOrder[seatIndex] = input.value.trim();
+    state.shuffledNames = normalizeSeatOrder(nextOrder);
+    state.revealMode = false;
+    state.revealedSeats = [];
+    updateTextareaFromSeatOrder();
+    saveState();
+    render();
+}
+
+function swapSeatOrder(fromIndex, toIndex) {
+    if (fromIndex === toIndex || isShuffling) {
+        return;
+    }
+
+    const nextOrder = fitNamesToSeatCount(currentSeatSource(), totalSeatCount(), {
+        keepEmptySeats: true,
+    });
+
+    [nextOrder[fromIndex], nextOrder[toIndex]] = [nextOrder[toIndex], nextOrder[fromIndex]];
     state.shuffledNames = normalizeSeatOrder(nextOrder);
     state.revealMode = false;
     state.revealedSeats = [];
@@ -506,6 +548,71 @@ elements.seatArea.addEventListener("click", (event) => {
     if (card) {
         handleSeatReveal(card);
     }
+});
+
+elements.seatArea.addEventListener("dragstart", (event) => {
+    const card = event.target.closest(".desk-card");
+
+    if (!card || isShuffling || state.revealMode) {
+        event.preventDefault();
+        return;
+    }
+
+    draggedSeatIndex = Number(card.dataset.seatIndex);
+    card.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(draggedSeatIndex));
+});
+
+elements.seatArea.addEventListener("dragover", (event) => {
+    const card = event.target.closest(".desk-card");
+
+    if (!card || draggedSeatIndex === null) {
+        return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+});
+
+elements.seatArea.addEventListener("dragenter", (event) => {
+    const card = event.target.closest(".desk-card");
+
+    if (!card || draggedSeatIndex === null || Number(card.dataset.seatIndex) === draggedSeatIndex) {
+        return;
+    }
+
+    card.classList.add("drop-target");
+});
+
+elements.seatArea.addEventListener("dragleave", (event) => {
+    const card = event.target.closest(".desk-card");
+
+    if (!card || card.contains(event.relatedTarget)) {
+        return;
+    }
+
+    card.classList.remove("drop-target");
+});
+
+elements.seatArea.addEventListener("drop", (event) => {
+    const card = event.target.closest(".desk-card");
+
+    if (!card || draggedSeatIndex === null) {
+        return;
+    }
+
+    event.preventDefault();
+    const fromIndex = draggedSeatIndex;
+    draggedSeatIndex = null;
+    swapSeatOrder(fromIndex, Number(card.dataset.seatIndex));
+});
+
+elements.seatArea.addEventListener("dragend", () => {
+    draggedSeatIndex = null;
+    elements.seatArea.querySelectorAll(".desk-card.dragging, .desk-card.drop-target").forEach((card) => {
+        card.classList.remove("dragging", "drop-target");
+    });
 });
 
 elements.seatArea.addEventListener("change", (event) => {
